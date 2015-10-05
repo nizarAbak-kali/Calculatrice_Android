@@ -1,21 +1,19 @@
 package com.example.nizar.calculatrice;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
 
-    private  int  gauche ,droite,compteur;
-    boolean update ,gauche_fill, droite_fill ;
+    double gauche, droite, compteur;
+    boolean update, operator_cliqued;
+    String operator_utilisee;
     Button[]buttons   ;
     EditText ecran;
 
@@ -30,9 +28,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     void init(){
         update = false;
-        gauche_fill = false;
-        droite_fill = false;
+        operator_utilisee = "";
+        operator_cliqued = false;
+
         ecran = (EditText) findViewById(R.id.editText);
+
+        buttons = new Button[19];
         buttons[0] = (Button) findViewById(R.id.button_pourcent);
         buttons[1] = (Button) findViewById(R.id.button_sqrt);
         buttons[2] = (Button) findViewById(R.id.button_square);
@@ -52,10 +53,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
         buttons[15] = (Button) findViewById(R.id.button_huit);
         buttons[16] = (Button) findViewById(R.id.button_neuf);
         buttons[17] = (Button) findViewById(R.id.button_equal);
-
+        buttons[18] = (Button) findViewById(R.id.button_C);
         for(int j=0;j<18;j++){
             buttons[j].setOnClickListener(this);
         }
+
     }
 
 
@@ -82,7 +84,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         return super.onOptionsItemSelected(item);
     }
 
-
+    // methode qui est executé quand on clique sur un chiffre
+    //
     void chiffre_Click(String string){
         if(update)
             update = false;
@@ -95,78 +98,213 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
 
 
-    void pourcentage(int a , int b) {
+    //Voici la méthode qui fait le calcul qui a été demandé par l'utilisateur
+    private void calcul() {
+        if (operator_utilisee.equals("+")) {
+            gauche += Double.valueOf(ecran.getText().toString()).doubleValue();
+            ecran.setText(String.valueOf(gauche));
+        }
 
-        gauche = a ;
-        droite = b ;
-        compteur = a * (b/100);
-    }
-    void soustration(int i , int j){
-        gauche = i ;
-        droite = j ;
-        compteur = i - j ;
-    }
-    void mult(int i , int j){
-        gauche = i ;
-        droite = j ;
-        compteur = i * j ;
-    }
-    void div(int i , int j){
-        gauche = i ;
-        droite = j ;
-        if (droite == 0)
-            compteur = 0;
-        else
-        compteur = i / j ;
-    }
-    void add(int i , int j){
-        gauche = i ;
-        droite = j ;
-        compteur = i + j ;
-    }
-    void square(int i ){
-        gauche = i ;
+        if (operator_utilisee.equals("-")) {
+            gauche = gauche - Double.valueOf(ecran.getText().toString()).doubleValue();
+            ecran.setText(String.valueOf(gauche));
+        }
 
-        compteur = i*i;
+        if (operator_utilisee.equals("*")) {
+            gauche = gauche * Double.valueOf(ecran.getText().toString()).doubleValue();
+            ecran.setText(String.valueOf(gauche));
+        }
+
+        if (operator_utilisee.equals("/")) {
+            try {
+                gauche = gauche / Double.valueOf(ecran.getText().toString()).doubleValue();
+                ecran.setText(String.valueOf(gauche));
+            } catch (ArithmeticException e) {
+                ecran.setText("0");
+            }
+        }
+        if (operator_utilisee.equals("%")) {
+            gauche = gauche * ((Double.valueOf(ecran.getText().toString()).doubleValue()) / 100);
+            ecran.setText(String.valueOf(gauche));
+        }
+
+        if (operator_utilisee.equals("sqrt")) {
+            gauche = Math.sqrt(gauche);
+            ecran.setText(String.valueOf(gauche));
+        }
+        if (operator_utilisee.equals("square")) {
+            gauche = gauche * gauche;
+            ecran.setText(String.valueOf(gauche));
+        }
+
+
     }
 
-    void sqrt(int i ){
-        gauche = i ;
-        if(i < 0)
-            compteur = 0 ;
-        else
-        compteur = (int) Math.sqrt(i);
+
+    void pourcentage() {
+        // si l'operateur a ete deja cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "%";
+        update = true;
+    }
+
+    //voici la méthode qui est  exécutée lorsque l'on clique sur le bouton -
+    void soustration() {
+        // si l'operateur a ete deja cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "-";
+        update = true;
+    }
+
+    void mult() {
+        // si l'operateur a ete deja cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "*";
+        update = true;
+    }
+
+    void div() {
+        // si l'operateur a ete deja cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "/";
+        update = true;
+    }
+
+    //voici la méthode qui est  exécutée lorsque l'on clique sur le bouton +
+    void add() {
+        // si l'operateur a ete cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "+";
+        update = true;
+    }
+
+    void square() {
+        // si l'operateur a ete deja cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "square";
+        update = true;
+    }
+
+    void sqrt() {
+        // si l'operateur a ete deja cliqué on le calcul
+        if (operator_cliqued) {
+            calcul();
+            ecran.setText(String.valueOf(gauche));
+        } else {
+            // sinon on recupere la valeur de ce qui est sur l'ecran et on set vrai le fait qu'on
+            // a clique sur le plus
+            gauche = Double.valueOf(ecran.getText().toString()).doubleValue();
+            operator_cliqued = true;
+        }
+        operator_utilisee = "sqrt";
+        update = true;
     }
     void equal(){
-        ecran.setText(compteur);
+        calcul();
+        update = true;
+        operator_cliqued = false;
     }
-    void calcul(){}
+
+    void reset() {
+        operator_cliqued = false;
+        update = true;
+        gauche = 0;
+        operator_utilisee = "";
+        ecran.setText(" ");
+
+    }
 
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
+
+            case R.id.button_C:
+                reset();
+                break;
+
             case R.id.button_add:
-                add(gauche,droite);
+                add();
                 break;
+
             case R.id.button_div:
-                div(gauche, droite);
+                div();
                 break;
+
             case R.id.button_equal:
-                    equal();
+                equal();
                 break;
+
+            case R.id.button_mult:
+                mult();
+                break;
+
+
             case R.id.button_soustraction:
-                soustration(gauche, droite);
+                soustration();
                 break;
+
             case R.id.button_sqrt:
-                sqrt(gauche);
+                sqrt();
                 break;
+
             case R.id.button_pourcent:
-                pourcentage(gauche, droite);
+                pourcentage();
                 break;
+
             case R.id.button_square:
-                square(gauche);
+                square();
                 break;
+
+
             case R.id.button_zeros:
                 chiffre_Click("0");
                 break;
@@ -181,7 +319,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
             case R.id.button_cinq:
                 chiffre_Click("5");
-                square(gauche);
                 break;
             case R.id.button_six:
                 chiffre_Click("6");
