@@ -9,7 +9,7 @@
     <EditText
         android:layout_width="357dp"
         android:layout_height="76dp"
-        android:text="0"
+        android:text="00"
         android:id="@+id/editText"
         android:layout_row="0"
         android:layout_column="0" />
@@ -161,10 +161,6 @@
                 android:id="@+id/button_sept"
                 android:layout_column="2" />
         </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></TableRow>
 
         <TableRow
             android:layout_width="match_parent"
